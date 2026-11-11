@@ -173,7 +173,10 @@ void main(
     newID.y = int(floor(linearID));
     newID.x = int(floor(frac(linearID) * BUFFER_X));
 
-    int2 groupBase = int2(OutputToInput(i_groupIdx * int2(GROUP_X, GROUP_Y)) - 1);
+    // Use floor, not int() truncation: for the first group row/column the value is in (-1.5, -0.5),
+    // and truncating (-1, -0.5) (positive jitter) to 0 makes the neighbourhood reads below use index -1
+    // of the groupshared arrays.
+    int2 groupBase = int2(floor(OutputToInput(i_groupIdx * int2(GROUP_X, GROUP_Y)) - 1));
 
     // Preload the colors and motion vectors into shared memory
 
